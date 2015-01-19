@@ -470,8 +470,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
 template <class Impl>
 FullO3CPU<Impl>::~FullO3CPU()
 {
-    // Clean up any unclaimed reads from Register file vulnerability
-    this->regVulCalc.cleanUpVul();
+
 }
 
 template <class Impl>
@@ -479,6 +478,9 @@ void
 FullO3CPU<Impl>::regStats()
 {
     BaseO3CPU::regStats();
+
+    // VUL_TRACKER REGISTER_FILE
+    regVulCalc.regStats();
 
     // Register any of the O3CPU's stats here.
     timesIdled
@@ -590,10 +592,6 @@ FullO3CPU<Impl>::regStats()
         .name(name() + ".misc_regfile_writes")
         .desc("number of misc regfile writes")
         .prereq(miscRegfileWrites);
-
-    regFileVul
-        .name(name() + ".regfile_vulnerability")
-        .desc("Vulnerability of the register file in bit-ticks");
 
     commitRenameMapVul
         .name(name() + ".commit_rename_map.vulnerability")

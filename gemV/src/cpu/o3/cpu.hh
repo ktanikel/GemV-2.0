@@ -882,8 +882,6 @@ class FullO3CPU : public BaseO3CPU
     Stats::Scalar miscRegfileReads;
     Stats::Scalar miscRegfileWrites;
 
-    // Vulenerability stat
-    Stats::Scalar regFileVul;                                   //VUL_RF
     // Vulnerability of commit rename map
     Stats::Formula commitRenameMapVul;                          //VUL_RENAME
     //Vulnerability of the Fetch Queue
