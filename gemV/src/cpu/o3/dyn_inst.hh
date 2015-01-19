@@ -259,29 +259,33 @@ class BaseO3DynInst : public BaseDynInst<Impl>
 
     uint64_t readIntRegOperand(const StaticInst *si, int idx)
     {
-        //VUL_TRACKER
-        this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
+        //VUL_TRACKER REGISTER_FILE
+        //this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
+        this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
         return this->cpu->readIntReg(this->_srcRegIdx[idx]);
     }
 
     FloatReg readFloatRegOperand(const StaticInst *si, int idx)
     {
-        //VUL_TRACKER
-        this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
+        //VUL_TRACKER REGISTER_FILE
+        //this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
+        this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
         return this->cpu->readFloatReg(this->_srcRegIdx[idx]);
     }
 
     FloatRegBits readFloatRegOperandBits(const StaticInst *si, int idx)
     {
-        //VUL_TRACKER
-        this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
+        //VUL_TRACKER REGISTER_FILE
+        //this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
+        this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
         return this->cpu->readFloatRegBits(this->_srcRegIdx[idx]);
     }
 
     uint64_t readCCRegOperand(const StaticInst *si, int idx)
     {
-        //VUL_TRACKER
-        this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
+        //VUL_TRACKER REGISTER_FILE
+        //this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
+        this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
         return this->cpu->readCCReg(this->_srcRegIdx[idx]);
     }
 
@@ -290,16 +294,18 @@ class BaseO3DynInst : public BaseDynInst<Impl>
      */
     void setIntRegOperand(const StaticInst *si, int idx, uint64_t val)
     {
-        //VUL_TRACKER
-        this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
+        //VUL_TRACKER REGISTER_FILE
+        //this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
+        this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
         this->cpu->setIntReg(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setIntRegOperand(si, idx, val);
     }
 
     void setFloatRegOperand(const StaticInst *si, int idx, FloatReg val)
     {
-        //VUL_TRACKER
-        this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
+        //VUL_TRACKER REGISTER_FILE
+        //this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
+        this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
         this->cpu->setFloatReg(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setFloatRegOperand(si, idx, val);
     }
@@ -307,16 +313,18 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     void setFloatRegOperandBits(const StaticInst *si, int idx,
                                 FloatRegBits val)
     {
-        //VUL_TRACKER
-        this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
+        //VUL_TRACKER REGISTER_FILE
+        //this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
+        this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
         this->cpu->setFloatRegBits(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setFloatRegOperandBits(si, idx, val);
     }
 
     void setCCRegOperand(const StaticInst *si, int idx, uint64_t val)
     {
-        //VUL_TRACKER
-        this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
+        //VUL_TRACKER REGISTER_FILE
+        //this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
+        this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
         this->cpu->setCCReg(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setCCRegOperand(si, idx, val);
     }

@@ -66,6 +66,8 @@
 #include "sim/stat_control.hh"
 #include "sim/system.hh"
 
+#include "debug/VulTracker.hh"      //VUL_TRACKER
+
 #if THE_ISA == ALPHA_ISA
 #include "arch/alpha/osfpal.hh"
 #include "debug/Activity.hh"
@@ -254,7 +256,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       system(params->system),
       drainManager(NULL),
       lastRunningCycle(curCycle()),
-      regVulCalc(params->numPhysIntRegs, params->numPhysFloatRegs),           //VUL_RF
+      regVulCalc(regFile.totalNumPhysRegs()),           //VUL_RF
       enableVulAnalysis(params->vul_analysis),                                //VUL_RF
       totalNumRegs(regFile.totalNumPhysRegs())                                //VUL_TRACKER
 {
@@ -1415,8 +1417,8 @@ uint64_t
 FullO3CPU<Impl>::readIntReg(int reg_idx)
 {
     intRegfileReads++;
-    if(enableVulAnalysis)
-        regFileVul += regVulCalc.vulOnRead(reg_idx, true);              //VUL_RF
+    //if(enableVulAnalysis)
+    //    regFileVul += regVulCalc.vulOnRead(reg_idx, true);              //VUL_RF
     return regFile.readIntReg(reg_idx);
 }
 
@@ -1425,8 +1427,8 @@ FloatReg
 FullO3CPU<Impl>::readFloatReg(int reg_idx)
 {
     fpRegfileReads++;
-    if(enableVulAnalysis)
-        regFileVul += regVulCalc.vulOnRead(reg_idx, false);              //VUL_RF
+    //if(enableVulAnalysis)
+    //    regFileVul += regVulCalc.vulOnRead(reg_idx, false);              //VUL_RF
     return regFile.readFloatReg(reg_idx);
 }
 
@@ -1435,8 +1437,8 @@ FloatRegBits
 FullO3CPU<Impl>::readFloatRegBits(int reg_idx)
 {
     fpRegfileReads++;
-    if(enableVulAnalysis)
-        regFileVul += regVulCalc.vulOnRead(reg_idx, false);              //VUL_RF
+    //if(enableVulAnalysis)
+    //    regFileVul += regVulCalc.vulOnRead(reg_idx, false);              //VUL_RF
     return regFile.readFloatRegBits(reg_idx);
 }
 
@@ -1445,8 +1447,8 @@ CCReg
 FullO3CPU<Impl>::readCCReg(int reg_idx)
 {
     ccRegfileReads++;
-    if(enableVulAnalysis)
-        regFileVul += regVulCalc.vulOnRead(reg_idx, true);              //VUL_RF
+    //if(enableVulAnalysis)
+    //    regFileVul += regVulCalc.vulOnRead(reg_idx, true);              //VUL_RF
     return regFile.readCCReg(reg_idx);
 }
 
@@ -1455,8 +1457,8 @@ void
 FullO3CPU<Impl>::setIntReg(int reg_idx, uint64_t val)
 {
     intRegfileWrites++;
-    if(enableVulAnalysis)
-        regVulCalc.vulOnWrite(reg_idx, true);              //VUL_RF
+    //if(enableVulAnalysis)
+    //    regVulCalc.vulOnWrite(reg_idx, true);              //VUL_RF
     regFile.setIntReg(reg_idx, val);
 }
 
@@ -1465,8 +1467,8 @@ void
 FullO3CPU<Impl>::setFloatReg(int reg_idx, FloatReg val)
 {
     fpRegfileWrites++;
-    if(enableVulAnalysis)
-        regVulCalc.vulOnWrite(reg_idx, false);              //VUL_RF
+    //if(enableVulAnalysis)
+    //    regVulCalc.vulOnWrite(reg_idx, false);              //VUL_RF
     regFile.setFloatReg(reg_idx, val);
 }
 
@@ -1475,8 +1477,8 @@ void
 FullO3CPU<Impl>::setFloatRegBits(int reg_idx, FloatRegBits val)
 {
     fpRegfileWrites++;
-    if(enableVulAnalysis)
-        regVulCalc.vulOnWrite(reg_idx, false);              //VUL_RF
+    //if(enableVulAnalysis)
+    //    regVulCalc.vulOnWrite(reg_idx, false);              //VUL_RF
     regFile.setFloatRegBits(reg_idx, val);
 }
 
@@ -1485,8 +1487,8 @@ void
 FullO3CPU<Impl>::setCCReg(int reg_idx, CCReg val)
 {
     ccRegfileWrites++;
-    if(enableVulAnalysis)
-        regVulCalc.vulOnWrite(reg_idx, true);              //VUL_RF
+    //if(enableVulAnalysis)
+    //    regVulCalc.vulOnWrite(reg_idx, true);              //VUL_RF
     regFile.setCCReg(reg_idx, val);
 }
 
@@ -1778,8 +1780,13 @@ FullO3CPU<Impl>::cleanUpRemovedInsts()
         */
         //VUL_PIPELINE end
         //VUL_TRACKER
-        if((*removeList.front())->isCommitted()) {
-            (*removeList.front())->vulT.printVulIntervals(ST_REGFILE, RF_REGISTER, (*removeList.front())->seqNum, 57); 
+        if(!(*removeList.front())->isCommitted()) {
+
+            regVulCalc.clearSquashedReads((*removeList.front())->seqNum);
+
+        } else {
+            //DPRINTF(VulTracker,"[sn:%i]: Committed %d\n", (*removeList.front())->seqNum, (int)(*removeList.front())->isCommitted());
+            //(*removeList.front())->vulT.printVulIntervals(ST_REGFILE, RF_REGISTER, (*removeList.front())->seqNum, i, (*removeList.front())->isCommitted()); 
         }
 
         instList.erase(removeList.front());
