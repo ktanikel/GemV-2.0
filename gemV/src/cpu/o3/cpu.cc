@@ -256,7 +256,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       system(params->system),
       drainManager(NULL),
       lastRunningCycle(curCycle()),
-      regVulCalc(regFile.totalNumPhysRegs()),           //VUL_RF
+      regVulCalc(regFile.totalNumPhysRegs(), params->fi_reg),           //VUL_RF
       enableVulAnalysis(params->vul_analysis),                                //VUL_RF
       totalNumRegs(regFile.totalNumPhysRegs())                                //VUL_TRACKER
 {
@@ -470,6 +470,8 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
 template <class Impl>
 FullO3CPU<Impl>::~FullO3CPU()
 {
+    // Clean up any unclaimed reads from Register file vulnerability
+    this->regVulCalc.cleanUpVul();
 }
 
 template <class Impl>

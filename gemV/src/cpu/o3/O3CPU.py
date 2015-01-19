@@ -145,6 +145,7 @@ class DerivO3CPU(BaseCPU):
                           "Enable TSO Memory model")
     #VUL
     vul_analysis = Param.Unsigned(1, "Enable/disable vulnerability analysis")
+    fi_reg = Param.Unsigned(1, "Register number for fault injection")
 
     def addCheckerCpu(self):
         if buildEnv['TARGET_ISA'] in ['arm']:

@@ -119,6 +119,8 @@ def addCommonOptions(parser):
                 choices = ["parity_block","parity_word","ecc_block","ecc_word","no_protection"],
                 help = "Cache protection model. Choose one of parity_block, parity_word\
                                                    ecc_block, ecc_word, no_protection")
+    parser.add_option("--fi_reg", type="int", default="1",
+                                help="display log for register")
 
     # Enable Ruby
     parser.add_option("--ruby", action="store_true")

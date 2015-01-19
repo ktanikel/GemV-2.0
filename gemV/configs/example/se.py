@@ -219,6 +219,8 @@ for i in xrange(np):
     #VUL
     if options.vul_analysis == "yes":                                   #VUL
         system.cpu[i].vul_analysis = 1;                                 #VUL
+    if options.fi_reg:
+        system.cpu[i].fi_reg = options.fi_reg
 
     system.cpu[i].createThreads()
 
