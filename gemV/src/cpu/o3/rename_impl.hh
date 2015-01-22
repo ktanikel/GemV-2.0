@@ -937,7 +937,8 @@ DefaultRename<Impl>::doSquash(const InstSeqNum &squashed_seq_num, ThreadID tid)
             freeList->addReg(hb_it->newPhysReg);
         }
         
-        histbufVul += histbufVulCalc.vulOnRead(hb_it->instSeqNum, tid);                   //VUL_RENAME
+        if(this->cpu->renameVulEnable)
+            histbufVul += histbufVulCalc.vulOnRead(hb_it->instSeqNum, tid);                   //VUL_RENAME
         
         historyBuffer[tid].erase(hb_it++);
 
@@ -988,7 +989,8 @@ DefaultRename<Impl>::removeFromHistory(InstSeqNum inst_seq_num, ThreadID tid)
 
         ++renameCommittedMaps;
         
-        histbufVulCalc.vulOnRemove(hb_it->instSeqNum, tid);                           //VUL_RENAME
+        if(this->cpu->renameVulEnable)
+            histbufVulCalc.vulOnRemove(hb_it->instSeqNum, tid);                           //VUL_RENAME
 
         historyBuffer[tid].erase(hb_it--);
     }
@@ -1121,7 +1123,8 @@ DefaultRename<Impl>::renameDestRegs(DynInstPtr &inst, ThreadID tid)
                                rename_result.first,
                                rename_result.second);
         
-        histbufVulCalc.vulOnWrite(inst->seqNum, tid);                            //VUL_RENAME
+        if(this->cpu->renameVulEnable)
+            histbufVulCalc.vulOnWrite(inst->seqNum, tid);                            //VUL_RENAME
 
         historyBuffer[tid].push_front(hb_entry);
 

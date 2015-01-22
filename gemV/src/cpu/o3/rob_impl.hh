@@ -223,8 +223,10 @@ ROB<Impl>::insertInst(DynInstPtr &inst)
     ThreadID tid = inst->threadNumber;
 
     instList[tid].push_back(inst);
+    
 
-    robVulCalc.vulOnInsert(numInstsInROB, tid, inst->seqNum);   //VUL_ROB
+    if(this->cpu->robVulEnable) 
+        robVulCalc.vulOnInsert(numInstsInROB, tid, inst->seqNum);   //VUL_ROB
     
     //Set Up head iterator if this is the 1st instruction in the ROB
     if (numInstsInROB == 0) {
@@ -366,8 +368,9 @@ ROB<Impl>::doSquash(ThreadID tid)
         (*squashIt[tid])->setSquashed();
 
         (*squashIt[tid])->setCanCommit();
-
-        robVulCalc.vulOnSquash(tid, (*squashIt[tid])->seqNum);      //VUL_ROB
+    
+        if(this->cpu->robVulEnable) 
+            robVulCalc.vulOnSquash(tid, (*squashIt[tid])->seqNum);      //VUL_ROB
 
         if (squashIt[tid] == instList[tid].begin()) {
             DPRINTF(ROB, "Reached head of instruction list while "

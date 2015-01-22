@@ -173,7 +173,8 @@ LSQUnit<Impl>::init(O3CPU *cpu_ptr, IEW *iew_ptr, DerivO3CPUParams *params,
     cachePorts = params->cachePorts;
     needsTSO = params->needsTSO;
     
-    lsqVulCalc.init(maxLQEntries, maxSQEntries);        //VUL_LSQ
+    if(this->cpu->lsqVulEnable)
+        lsqVulCalc.init(maxLQEntries, maxSQEntries);        //VUL_LSQ
         
     resetState();
 }
@@ -377,7 +378,8 @@ LSQUnit<Impl>::insertLoad(DynInstPtr &load_inst)
 
     loadQueue[loadTail] = load_inst;
 
-    lsqVulCalc.vulOnInsertLoad(load_inst->seqNum, loadTail);        //VUL_LSQ
+    if(this->cpu->lsqVulEnable)
+        lsqVulCalc.vulOnInsertLoad(load_inst->seqNum, loadTail);        //VUL_LSQ
     
     incrLdIdx(loadTail);
 
@@ -680,7 +682,8 @@ LSQUnit<Impl>::commitLoad()
     DPRINTF(LSQUnit, "Committing head load instruction, PC %s\n",
             loadQueue[loadHead]->pcState());
 
-   lsqVulnerability += lsqVulCalc.vulOnCommitLoad(loadHead, loadQueue[loadHead]->seqNum);       //VUL_LSQ
+    if(this->cpu->lsqVulEnable)
+        lsqVulnerability += lsqVulCalc.vulOnCommitLoad(loadHead, loadQueue[loadHead]->seqNum);       //VUL_LSQ
     loadQueue[loadHead] = NULL;
 
 
@@ -805,7 +808,8 @@ LSQUnit<Impl>::writebackStores()
 
         storeQueue[storeWBIdx].committed = true;
 
-        lsqVulnerability += lsqVulCalc.vulOnCommitStore(storeWBIdx, storeQueue[storeWBIdx].inst->seqNum);       //VUL_LSQ
+        if(this->cpu->lsqVulEnable)
+            lsqVulnerability += lsqVulCalc.vulOnCommitStore(storeWBIdx, storeQueue[storeWBIdx].inst->seqNum);       //VUL_LSQ
         assert(!inst->memData);
         inst->memData = new uint8_t[64];
 
@@ -988,7 +992,8 @@ LSQUnit<Impl>::squash(const InstSeqNum &squashed_num)
             stallingLoadIdx = 0;
         }
 
-        lsqVulCalc.vulOnSquash(true, load_idx, loadQueue[load_idx]->seqNum);     //VUL_LSQ
+        if(this->cpu->lsqVulEnable)
+            lsqVulCalc.vulOnSquash(true, load_idx, loadQueue[load_idx]->seqNum);     //VUL_LSQ
 
         // Clear the smart pointer to make sure it is decremented.
         loadQueue[load_idx]->setSquashed();
@@ -1039,7 +1044,8 @@ LSQUnit<Impl>::squash(const InstSeqNum &squashed_num)
             stallingStoreIsn = 0;
         }
 
-        lsqVulCalc.vulOnSquash(false, store_idx, storeQueue[store_idx].inst->seqNum);     //VUL_LSQ
+        if(this->cpu->lsqVulEnable)
+            lsqVulCalc.vulOnSquash(false, store_idx, storeQueue[store_idx].inst->seqNum);     //VUL_LSQ
 
         // Clear the smart pointer to make sure it is decremented.
         storeQueue[store_idx].inst->setSquashed();

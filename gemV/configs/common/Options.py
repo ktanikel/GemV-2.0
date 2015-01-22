@@ -121,6 +121,8 @@ def addCommonOptions(parser):
                                                    ecc_block, ecc_word, no_protection")
     parser.add_option("--fi_reg", type="int", default="1",
                                 help="display log for register")
+    parser.add_option("--vul_params", type="string",
+                help = "File specifying vulnerability enable options for each microarch component.")
 
     # Enable Ruby
     parser.add_option("--ruby", action="store_true")

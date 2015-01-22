@@ -261,7 +261,8 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     {
         //VUL_TRACKER REGISTER_FILE
         //this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
-        this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
+        if(this->cpu->rfVulEnable)
+            this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
         return this->cpu->readIntReg(this->_srcRegIdx[idx]);
     }
 
@@ -269,7 +270,8 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     {
         //VUL_TRACKER REGISTER_FILE
         //this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
-        this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
+        if(this->cpu->rfVulEnable)
+            this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
         return this->cpu->readFloatReg(this->_srcRegIdx[idx]);
     }
 
@@ -277,7 +279,8 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     {
         //VUL_TRACKER REGISTER_FILE
         //this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
-        this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
+        if(this->cpu->rfVulEnable)
+            this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
         return this->cpu->readFloatRegBits(this->_srcRegIdx[idx]);
     }
 
@@ -285,7 +288,8 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     {
         //VUL_TRACKER REGISTER_FILE
         //this->vulT.vulOnRead(ST_REGFILE, RF_REGISTER, this->_srcRegIdx[idx]);
-        this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
+        if(this->cpu->rfVulEnable)
+            this->cpu->regVulCalc.vulOnRead(this->_srcRegIdx[idx], this->seqNum);
         return this->cpu->readCCReg(this->_srcRegIdx[idx]);
     }
 
@@ -296,7 +300,8 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     {
         //VUL_TRACKER REGISTER_FILE
         //this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
-        this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
+        if(this->cpu->rfVulEnable)
+            this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
         this->cpu->setIntReg(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setIntRegOperand(si, idx, val);
     }
@@ -305,7 +310,8 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     {
         //VUL_TRACKER REGISTER_FILE
         //this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
-        this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
+        if(this->cpu->rfVulEnable)
+            this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
         this->cpu->setFloatReg(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setFloatRegOperand(si, idx, val);
     }
@@ -315,7 +321,8 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     {
         //VUL_TRACKER REGISTER_FILE
         //this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
-        this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
+        if(this->cpu->rfVulEnable)
+            this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
         this->cpu->setFloatRegBits(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setFloatRegOperandBits(si, idx, val);
     }
@@ -324,7 +331,8 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     {
         //VUL_TRACKER REGISTER_FILE
         //this->vulT.vulOnWrite(ST_REGFILE, RF_REGISTER, this->_destRegIdx[idx]);
-        this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
+        if(this->cpu->rfVulEnable)
+            this->cpu->regVulCalc.vulOnWrite(this->_destRegIdx[idx], this->seqNum);
         this->cpu->setCCReg(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setCCRegOperand(si, idx, val);
     }

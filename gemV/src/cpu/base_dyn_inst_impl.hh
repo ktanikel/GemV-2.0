@@ -136,7 +136,7 @@ BaseDynInst<Impl>::initVars()
 
     //VUL_TRACKER
     vulT.initVars(numDestRegs(),numSrcRegs(),sizeof(pcState()),
-                            cpu->totalNumRegs);
+                            cpu->totalNumRegs, this->seqNum);
 }
 
 template <class Impl>

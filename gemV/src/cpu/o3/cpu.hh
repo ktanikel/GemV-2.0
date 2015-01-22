@@ -70,7 +70,8 @@
 #include "base/vulnerability/vul_regfile.hh"                    //VUL_RF
 
 #include "base/vulnerability/vul_tracker.hh"                    //VUL_TRACKER
-#include "base/vulnerability/vul_structs.hh"
+#include "base/vulnerability/vul_structs.hh"                    //VUL_TRACKER
+#include "base/vulnerability/vul_pipeline.hh"                   //VUL_TRACKER
 
 template <class>
 class Checker;
@@ -808,10 +809,34 @@ class FullO3CPU : public BaseO3CPU
     Cycles lastRunningCycle;
 
     /** Register file vulnerability calculator */
-    RegVulCalc regVulCalc;                                  //VUL_RF
+    RegVulCalc regVulCalc;                                  //VUL_TRACKER
+
+    /** Fetch Queue vulnerability calculator */
+    PipeVulTracker pipeVulT;
 
     /** Enable/disable vulnerability analysis */
-    bool enableVulAnalysis;                                 //VUL
+    bool enableVulAnalysis;                                 //VUL_TRACKER
+
+    /** Enable/disable vulnerability analysis */
+    bool robVulEnable;                                       //VUL_TRACKER
+
+    /** Enable/disable vulnerability analysis */
+    bool rfVulEnable;                                       //VUL_TRACKER
+
+    /** Enable/disable vulnerability analysis */
+    bool cacheVulEnable;                                       //VUL_TRACKER
+
+    /** Enable/disable vulnerability analysis */
+    bool iqVulEnable;                                       //VUL_TRACKER
+
+    /** Enable/disable vulnerability analysis */
+    bool lsqVulEnable;                                       //VUL_TRACKER
+
+    /** Enable/disable vulnerability analysis */
+    bool pipeVulEnable;                                       //VUL_TRACKER
+
+    /** Enable/disable vulnerability analysis */
+    bool renameVulEnable;                                       //VUL_TRACKER
 
     /** Ease of programming */
     int totalNumRegs;                                       //VUL_TRACKER

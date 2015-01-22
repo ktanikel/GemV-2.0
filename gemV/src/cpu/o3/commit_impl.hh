@@ -1018,7 +1018,8 @@ DefaultCommit<Impl>::commitInsts()
             if (commit_success) {
                 ++num_committed;
                 
-                rob->incrVul(rob->robVulCalc.vulOnCommit(tid, head_inst->seqNum));              //VUL_ROB
+                if(this->cpu->robVulEnable) 
+                    rob->incrVul(rob->robVulCalc.vulOnCommit(tid, head_inst->seqNum));              //VUL_TRACKER
 
                 changedROBNumEntries[tid] = true;
 

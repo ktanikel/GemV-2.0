@@ -257,7 +257,14 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       drainManager(NULL),
       lastRunningCycle(curCycle()),
       regVulCalc(regFile.totalNumPhysRegs(), params->fi_reg),           //VUL_RF
-      enableVulAnalysis(params->vul_analysis),                                //VUL_RF
+      enableVulAnalysis(params->vul_analysis),                                //VUL_TRACKER
+      robVulEnable(params->rob_vul_enable),                                   //VUL_TRACKER
+      rfVulEnable(params->rf_vul_enable),                                   //VUL_TRACKER
+      cacheVulEnable(params->cache_vul_enable),                                   //VUL_TRACKER
+      iqVulEnable(params->iq_vul_enable),                                   //VUL_TRACKER
+      lsqVulEnable(params->lsq_vul_enable),                                   //VUL_TRACKER
+      pipeVulEnable(params->pipeline_vul_enable),                                   //VUL_TRACKER
+      renameVulEnable(params->rename_vul_enable),                                   //VUL_TRACKER
       totalNumRegs(regFile.totalNumPhysRegs())                                //VUL_TRACKER
 {
     if (!params->switched_out) {
@@ -1780,9 +1787,9 @@ FullO3CPU<Impl>::cleanUpRemovedInsts()
         */
         //VUL_PIPELINE end
         //VUL_TRACKER
-        if(!(*removeList.front())->isCommitted()) {
-
-            regVulCalc.clearSquashedReads((*removeList.front())->seqNum);
+        if((*removeList.front())->isSquashed() || !(*removeList.front())->isCommitted()) {
+            if(rfVulEnable)
+                regVulCalc.clearSquashedAccess((*removeList.front())->seqNum);
 
         } else {
             //DPRINTF(VulTracker,"[sn:%i]: Committed %d\n", (*removeList.front())->seqNum, (int)(*removeList.front())->isCommitted());

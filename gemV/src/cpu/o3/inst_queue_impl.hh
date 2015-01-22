@@ -565,7 +565,7 @@ InstructionQueue<Impl>::insert(DynInstPtr &new_inst)
 
     instList[new_inst->threadNumber].push_back(new_inst);
     
-    if(cpu->enableVulAnalysis)
+    if(this->cpu->iqVulEnable)
         iqVulCalc.vulOnInsert(new_inst->threadNumber, new_inst->seqNum);       //VUL_IQ
 
     --freeEntries;
@@ -613,7 +613,7 @@ InstructionQueue<Impl>::insertNonSpec(DynInstPtr &new_inst)
 
     instList[new_inst->threadNumber].push_back(new_inst);
 
-    if(cpu->enableVulAnalysis)
+    if(this->cpu->iqVulEnable)
         iqVulCalc.vulOnInsert(new_inst->threadNumber, new_inst->seqNum);       //VUL_IQ
 
     --freeEntries;
@@ -864,7 +864,7 @@ InstructionQueue<Impl>::scheduleReadyInsts()
             if (!issuing_inst->isMemRef()) {
                 // Memory instructions can not be freed from the IQ until they
                 // complete.
-                if(cpu->enableVulAnalysis)
+                if(this->cpu->iqVulEnable)
                     iqVulCalc.vulOnIssue(issuing_inst->threadNumber, issuing_inst->seqNum);  //VUL_IQ
                 ++freeEntries;
                 count[tid]--;
@@ -941,7 +941,7 @@ InstructionQueue<Impl>::commit(const InstSeqNum &inst, ThreadID tid)
         instList[tid].pop_front();
     }
 
-    if(cpu->enableVulAnalysis)
+    if(this->cpu->iqVulEnable)
         instQueueVul += iqVulCalc.vulOnCommit(tid, inst);  //VUL_IQ
     assert(freeEntries == (numEntries - countInsts()));
 }
@@ -1081,7 +1081,7 @@ InstructionQueue<Impl>::completeMemInst(DynInstPtr &completed_inst)
     DPRINTF(IQ, "Completing mem instruction PC: %s [sn:%lli]\n",
             completed_inst->pcState(), completed_inst->seqNum);
 
-    if(cpu->enableVulAnalysis)
+    if(this->cpu->iqVulEnable)
         iqVulCalc.vulOnIssue(tid, completed_inst->seqNum);  //VUL_IQ
     ++freeEntries;
 
@@ -1243,7 +1243,7 @@ InstructionQueue<Impl>::doSquash(ThreadID tid)
         instList[tid].erase(squash_it--);
         ++iqSquashedInstsExamined;
     }
-    if(cpu->enableVulAnalysis)
+    if(this->cpu->iqVulEnable)
         iqVulCalc.vulOnSquash(tid, squashedSeqNum[tid]);       //VUL_IQ
 }
 

@@ -86,6 +86,7 @@ Source('vulnerability/vul_histbuf.cc')
 Source('vulnerability/vul_tracker.cc')
 Source('vulnerability/vul_structs.cc')
 Source('vulnerability/vul_access.cc')
+Source('vulnerability/vul_pipeline.cc')
 #Source('vulnerability/vulnerabilityContainer.cc')
 #Source('vulnerability/vulnerability_tracker.cc')
 
