@@ -1505,6 +1505,11 @@ FullO3CPU<Impl>::readArchIntReg(int reg_idx, ThreadID tid)
 {
     intRegfileReads++;
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupInt(reg_idx);
+    
+    //VUL_TRACKER
+    if(rfVulEnable)
+        this->regVulCalc.vulOnRead(phys_reg, 0);
+
     return regFile.readIntReg(phys_reg);
 }
 
