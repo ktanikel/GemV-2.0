@@ -1505,7 +1505,6 @@ FullO3CPU<Impl>::readArchIntReg(int reg_idx, ThreadID tid)
 {
     intRegfileReads++;
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupInt(reg_idx);
-
     return regFile.readIntReg(phys_reg);
 }
 
@@ -1515,6 +1514,10 @@ FullO3CPU<Impl>::readArchFloatReg(int reg_idx, ThreadID tid)
 {
     fpRegfileReads++;
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupFloat(reg_idx);
+    
+    //VUL_TRACKER
+    if(rfVulEnable)
+        this->regVulCalc.vulOnRead(phys_reg, 0);
 
     return regFile.readFloatReg(phys_reg);
 }
@@ -1525,6 +1528,10 @@ FullO3CPU<Impl>::readArchFloatRegInt(int reg_idx, ThreadID tid)
 {
     fpRegfileReads++;
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupFloat(reg_idx);
+    
+    //VUL_TRACKER
+    if(rfVulEnable)
+        this->regVulCalc.vulOnRead(phys_reg, 0);
 
     return regFile.readFloatRegBits(phys_reg);
 }
@@ -1536,6 +1543,10 @@ FullO3CPU<Impl>::readArchCCReg(int reg_idx, ThreadID tid)
     ccRegfileReads++;
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupCC(reg_idx);
 
+    //VUL_TRACKER
+    if(rfVulEnable)
+        this->regVulCalc.vulOnRead(phys_reg, 0);
+
     return regFile.readCCReg(phys_reg);
 }
 
@@ -1546,6 +1557,10 @@ FullO3CPU<Impl>::setArchIntReg(int reg_idx, uint64_t val, ThreadID tid)
     intRegfileWrites++;
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupInt(reg_idx);
 
+    //VUL_TRACKER
+    if(rfVulEnable)
+        this->regVulCalc.vulOnWrite(phys_reg, 0);
+
     regFile.setIntReg(phys_reg, val);
 }
 
@@ -1555,6 +1570,10 @@ FullO3CPU<Impl>::setArchFloatReg(int reg_idx, float val, ThreadID tid)
 {
     fpRegfileWrites++;
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupFloat(reg_idx);
+    
+    //VUL_TRACKER
+    if(rfVulEnable)
+        this->regVulCalc.vulOnWrite(phys_reg, 0);
 
     regFile.setFloatReg(phys_reg, val);
 }
@@ -1565,6 +1584,10 @@ FullO3CPU<Impl>::setArchFloatRegInt(int reg_idx, uint64_t val, ThreadID tid)
 {
     fpRegfileWrites++;
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupFloat(reg_idx);
+    
+    //VUL_TRACKER
+    if(rfVulEnable)
+        this->regVulCalc.vulOnWrite(phys_reg, 0);
 
     regFile.setFloatRegBits(phys_reg, val);
 }
@@ -1575,6 +1598,10 @@ FullO3CPU<Impl>::setArchCCReg(int reg_idx, CCReg val, ThreadID tid)
 {
     ccRegfileWrites++;
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupCC(reg_idx);
+    
+    //VUL_TRACKER
+    if(rfVulEnable)
+        this->regVulCalc.vulOnWrite(phys_reg, 0);
 
     regFile.setCCReg(phys_reg, val);
 }
