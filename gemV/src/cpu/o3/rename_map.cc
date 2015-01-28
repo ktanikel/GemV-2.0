@@ -99,8 +99,8 @@ UnifiedRenameMap::init(PhysRegFile *_regFile,
 
     ccMap.init(TheISA::NumFloatRegs, &(freeList->ccList), (RegIndex)-1);
 
-    renameVulCalc.init(freeList->numFreeIntRegs(), freeList->numFreeFloatRegs()
-                            , freeList->numFreeCCRegs());
+    //renameVulCalc.init(freeList->numFreeIntRegs(), freeList->numFreeFloatRegs()
+    //                        , freeList->numFreeCCRegs());
     //renameVulCalc.init(TheISA::NumIntRegs, TheISA::NumFloatRegs, TheISA::NumCCRegs);
 }
 

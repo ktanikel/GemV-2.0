@@ -402,7 +402,8 @@ LSQUnit<Impl>::insertStore(DynInstPtr &store_inst)
 
     storeQueue[storeTail] = SQEntry(store_inst);
 
-    lsqVulCalc.vulOnInsertStore(store_inst->seqNum, storeTail);
+    if(this->cpu->lsqVulEnable)
+        lsqVulCalc.vulOnInsertStore(store_inst->seqNum, storeTail);     //VUL_LSQ
 
     incrStIdx(storeTail);
 

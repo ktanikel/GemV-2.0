@@ -469,46 +469,12 @@ DefaultDecode<Impl>::sortInsts()
 {
     int insts_from_fetch = fromFetch->size;
 
-    //VUL_PIPELINE start
-    //vulParams vtemp = {0,false,false,0,0,0};
-    //vulParams *vp = &vtemp;
-    //VUL_PIPELNE end
-
     for (int i = 0; i < insts_from_fetch; ++i) {
         insts[fromFetch->insts[i]->threadNumber].push(fromFetch->insts[i]);
-        //VUL_PIPELINE start
-        /*
-        fromFetch->insts[i]->vulT.trackAccess(REMOVEFIELD, FETCHQUEUE, INST_OPCODE);
-        fromFetch->insts[i]->vulT.trackAccess(REMOVEFIELD, FETCHQUEUE, INST_PC);
-        fromFetch->insts[i]->vulT.trackAccess(REMOVEFIELD, FETCHQUEUE, INST_TID);
-        fromFetch->insts[i]->vulT.trackAccess(REMOVEFIELD, FETCHQUEUE, INST_SEQNUM);
-        fromFetch->insts[i]->vulT.trackAccess(REMOVEFIELD, FETCHQUEUE, INST_PREDPC);
-        fromFetch->insts[i]->vulT.trackAccess(REMOVEFIELD, FETCHQUEUE, INST_FLAGS);
-        fromFetch->insts[i]->vulT.trackAccess(REMOVEFIELD, FETCHQUEUE, INST_FAULT);
-        */
-        /*
-        for(int i = 0; i < fromFetch->insts[i]->numDestRegs(); ++i) {
-            fromFetch->insts[i]->vulT.trackRegAccess(REMOVEFIELD, FETCHQUEUE, INST_DESTREGSIDX, i);
-        }
 
-        for(int i = 0; i < fromFetch->insts[i]->numSrcRegs(); ++i) {
-            fromFetch->insts[i]->vulT.trackRegAccess(REMOVEFIELD, FETCHQUEUE, INST_SRCREGSIDX, i);
-        }
-        */
-        //VUL_PIPELINE start
-        /*
-        vp->compID = PR_BASE_ID;
-        vp->WriteRead = false;
-        vp->seqNum = fromFetch->insts[i]->seqNum;
-        vp->Stage = STAGE_DECODE;
-        vp->type = Inst;
-        cpu->vulContainer->registerVulComponentAccess(fromFetch->insts[i], vp);
-        vp->type = Ctrl;
-        cpu->vulContainer->registerVulComponentAccess(fromFetch->insts[i], vp);
-        vp->type = Data;
-        cpu->vulContainer->registerVulComponentAccess(fromFetch->insts[i], vp);
-        */
-        //VUL_PIPELINE end
+        //VUL_TRACKER Reading from Fetch Queue
+        if(this->cpu->pipeVulEnable)
+            this->cpu->pipeVulT.vulOnRead(P_FETCHQ, P_SEQNUM, fromFetch->insts[i]->seqNum);
     }
 }
 
@@ -768,20 +734,9 @@ DefaultDecode<Impl>::decodeInsts(ThreadID tid)
         ++decodeDecodedInsts;
         --insts_available;
 
-        //VUL_PIPELINE start
-        /*
-        vp->compID = PR_BASE_ID;
-        vp->WriteRead = true;
-        vp->seqNum = inst->seqNum;
-        vp->Stage = STAGE_DECODE_PLUS;
-        vp->type = Inst;
-        cpu->vulContainer->registerVulComponentAccess(inst, vp);
-        vp->type = Ctrl;
-        cpu->vulContainer->registerVulComponentAccess(inst, vp);
-        vp->type = Data;
-        cpu->vulContainer->registerVulComponentAccess(inst, vp);
-        */
-        //VUL_PIPELINE end
+        //VUL_TRACKER Writing to decode Queue
+        if(this->cpu->pipeVulEnable)
+            this->cpu->pipeVulT.vulOnWrite(P_DECODEQ, P_SEQNUM, inst->seqNum);
 
 #if TRACING_ON
         if (DTRACE(O3PipeView)) {

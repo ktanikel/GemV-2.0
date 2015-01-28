@@ -174,16 +174,16 @@ DefaultRename<Impl>::regStats()
         .name(name() + ".fp_rename_lookups")
         .desc("Number of floating rename lookups")
         .prereq(fpRenameLookups);
-    renameMapVul                                                            //VUL_RENAME
-        .name(name() + ".map.vulnerability")
-        .desc("Vulnerability of the Rename Map in bit-ticks")
-        .precision(0);
-    for(unsigned i = 0; i < numThreads; ++i)    
-        renameMapVul += renameMap[i]->renameMapVul;
+    //renameMapVul                                                            //VUL_RENAME
+    //    .name(name() + ".map.vulnerability")
+    //    .desc("Vulnerability of the Rename Map in bit-ticks")
+    //    .precision(0);
+    //for(unsigned i = 0; i < numThreads; ++i)    
+    //    renameMapVul += renameMap[i]->renameMapVul;
               
-    histbufVul                                                              //VUL_RENAME
-        .name(name() + ".histbuf.vulnerability")
-        .desc("Vulnerability of the History Buffer in bit-ticks");
+    //histbufVul                                                              //VUL_RENAME
+    //    .name(name() + ".histbuf.vulnerability")
+    //    .desc("Vulnerability of the History Buffer in bit-ticks");
 }
 
 template <class Impl>
@@ -685,20 +685,9 @@ DefaultRename<Impl>::renameInsts(ThreadID tid)
         // Decrement how many instructions are available.
         --insts_available;
 
-        //VUL_PIPELINE start
-        /*
-        vp->compID = PR_BASE_ID;
-        vp->WriteRead = true;
-        vp->seqNum = inst->seqNum;
-        vp->Stage = STAGE_EXECUTE;
-        vp->type = Inst;
-        cpu->vulContainer->registerVulComponentAccess(inst, vp);
-        vp->type = Ctrl;
-        cpu->vulContainer->registerVulComponentAccess(inst, vp);
-        vp->type = Data;
-        cpu->vulContainer->registerVulComponentAccess(inst, vp);
-        */
-        //VUL_PIPELINE end
+        //VUL_TRACKER Writing to Rename Queue
+        if(this->cpu->pipeVulEnable)
+            this->cpu->pipeVulT.vulOnWrite(P_RENAMEQ, P_SEQNUM, inst->seqNum);
     }
 
     instsInProgress[tid] += renamed_insts;
@@ -766,20 +755,9 @@ DefaultRename<Impl>::sortInsts()
         DynInstPtr inst = fromDecode->insts[i];
         insts[inst->threadNumber].push_back(inst);
 
-        //VUL_PIPELINE start
-        /*
-        vp->compID = PR_BASE_ID;
-        vp->WriteRead = false;
-        vp->seqNum = fromDecode->insts[i]->seqNum;
-        vp->Stage = STAGE_DECODE_PLUS;
-        vp->type = Inst;
-        cpu->vulContainer->registerVulComponentAccess(fromDecode->insts[i], vp);
-        vp->type = Ctrl;
-        cpu->vulContainer->registerVulComponentAccess(fromDecode->insts[i], vp);
-        vp->type = Data;
-        cpu->vulContainer->registerVulComponentAccess(fromDecode->insts[i], vp);
-        */
-        //VUL_PIPELINE end
+        //VUL_TRACKER Reading from Decode Queue
+        if(this->cpu->pipeVulEnable)
+            this->cpu->pipeVulT.vulOnRead(P_DECODEQ, P_SEQNUM, fromDecode->insts[i]->seqNum);
 
 #if TRACING_ON
         if (DTRACE(O3PipeView)) {
@@ -932,14 +910,18 @@ DefaultRename<Impl>::doSquash(const InstSeqNum &squashed_seq_num, ThreadID tid)
             // Tell the rename map to set the architected register to the
             // previous physical register that it was renamed to.
             renameMap[tid]->setEntry(hb_it->archReg, hb_it->prevPhysReg);
+            
+            //VUL_TRACKER Write to Rename map
+            if(this->cpu->renameVulEnable)
+                this->cpu->renameVulT.vulOnWrite(hb_it->archReg, 0, tid);
 
             // Put the renamed physical register back on the free list.
             freeList->addReg(hb_it->newPhysReg);
         }
-        
+       /* 
         if(this->cpu->renameVulEnable)
             histbufVul += histbufVulCalc.vulOnRead(hb_it->instSeqNum, tid);                   //VUL_RENAME
-        
+        */
         historyBuffer[tid].erase(hb_it++);
 
         ++renameUndoneMaps;
@@ -988,10 +970,10 @@ DefaultRename<Impl>::removeFromHistory(InstSeqNum inst_seq_num, ThreadID tid)
         }
 
         ++renameCommittedMaps;
-        
+       /* 
         if(this->cpu->renameVulEnable)
             histbufVulCalc.vulOnRemove(hb_it->instSeqNum, tid);                           //VUL_RENAME
-
+        */
         historyBuffer[tid].erase(hb_it--);
     }
 }
@@ -1016,20 +998,35 @@ DefaultRename<Impl>::renameSrcRegs(DynInstPtr &inst, ThreadID tid)
           case IntRegClass:
             flat_rel_src_reg = tc->flattenIntIndex(rel_src_reg);
             renamed_reg = map->lookupInt(flat_rel_src_reg);
-            //renameMapVul += renameVulCalc.vulOnRead(renamed_reg); 
+
+            //VUL_TRACKER Read rename map
+            if(this->cpu->renameVulEnable)
+                this->cpu->renameVulT.vulOnRead((int)flat_rel_src_reg, inst->seqNum, tid);
+
             intRenameLookups++;
             break;
 
           case FloatRegClass:
             flat_rel_src_reg = tc->flattenFloatIndex(rel_src_reg);
             renamed_reg = map->lookupFloat(flat_rel_src_reg);
-            //renameMapVul += renameVulCalc.vulOnRead(renamed_reg); 
+
+            //VUL_TRACKER Read rename map
+            if(this->cpu->renameVulEnable)
+                this->cpu->renameVulT.vulOnRead((int)(flat_rel_src_reg + TheISA::NumIntRegs), 
+                                    inst->seqNum, tid);
+
             fpRenameLookups++;
             break;
 
           case CCRegClass:
             flat_rel_src_reg = tc->flattenCCIndex(rel_src_reg);
             renamed_reg = map->lookupCC(flat_rel_src_reg);
+
+            //VUL_TRACKER Read rename map
+            if(this->cpu->renameVulEnable)
+                this->cpu->renameVulT.vulOnRead((int)(flat_rel_src_reg + TheISA::NumIntRegs + TheISA::NumFloatRegs), 
+                                    inst->seqNum, tid);
+
             break;
 
           case MiscRegClass:
@@ -1084,18 +1081,41 @@ DefaultRename<Impl>::renameDestRegs(DynInstPtr &inst, ThreadID tid)
             flat_rel_dest_reg = tc->flattenIntIndex(rel_dest_reg);
             rename_result = map->renameInt(flat_rel_dest_reg);
             flat_uni_dest_reg = flat_rel_dest_reg;  // 1:1 mapping
+            
+            //VUL_TRACKER Write to Rename map
+            if(this->cpu->renameVulEnable) {
+                this->cpu->renameVulT.vulOnRead((int)flat_rel_dest_reg, inst->seqNum, tid);
+                this->cpu->renameVulT.vulOnWrite((int)flat_rel_dest_reg, inst->seqNum, tid);
+            }
+
             break;
 
           case FloatRegClass:
             flat_rel_dest_reg = tc->flattenFloatIndex(rel_dest_reg);
             rename_result = map->renameFloat(flat_rel_dest_reg);
             flat_uni_dest_reg = flat_rel_dest_reg + TheISA::FP_Reg_Base;
+
+            //VUL_TRACKER Write to Rename map
+            if(this->cpu->renameVulEnable) {
+                this->cpu->renameVulT.vulOnRead((int)(flat_rel_dest_reg + TheISA::NumIntRegs)
+                            , inst->seqNum, tid);
+                this->cpu->renameVulT.vulOnWrite((int)(flat_rel_dest_reg + TheISA::NumIntRegs)
+                            , inst->seqNum, tid);
+            }
+
             break;
 
           case CCRegClass:
             flat_rel_dest_reg = tc->flattenCCIndex(rel_dest_reg);
             rename_result = map->renameCC(flat_rel_dest_reg);
             flat_uni_dest_reg = flat_rel_dest_reg + TheISA::CC_Reg_Base;
+
+            //VUL_TRACKER Write to Rename map
+            if(this->cpu->renameVulEnable) {
+                this->cpu->renameVulT.vulOnRead((int)(flat_rel_dest_reg + TheISA::NumIntRegs + TheISA::NumFloatRegs), inst->seqNum, tid);
+                this->cpu->renameVulT.vulOnWrite((int)(flat_rel_dest_reg + TheISA::NumIntRegs + TheISA::NumFloatRegs), inst->seqNum, tid);
+            }
+
             break;
 
           case MiscRegClass:
@@ -1122,10 +1142,10 @@ DefaultRename<Impl>::renameDestRegs(DynInstPtr &inst, ThreadID tid)
         RenameHistory hb_entry(inst->seqNum, flat_uni_dest_reg,
                                rename_result.first,
                                rename_result.second);
-        
+       /* 
         if(this->cpu->renameVulEnable)
             histbufVulCalc.vulOnWrite(inst->seqNum, tid);                            //VUL_RENAME
-
+        */
         historyBuffer[tid].push_front(hb_entry);
 
         DPRINTF(Rename, "[tid:%u]: Adding instruction to history buffer "

@@ -548,6 +548,9 @@ template <class Impl>
 void
 ROB<Impl>::regStats()
 {
+    //VUL_ROB
+    robVulCalc.regStats();
+
     using namespace Stats;
     robReads
         .name(name() + ".rob_reads")
@@ -556,18 +559,6 @@ ROB<Impl>::regStats()
     robWrites
         .name(name() + ".rob_writes")
         .desc("The number of ROB writes");
-
-    robVul                                  //VUL_ROB
-        .name(name() + ".vulnerability")
-        .desc("Vulnerability of the ROB in bit-ticks");
-}
-
-//VUL_ROB
-template <class Impl>
-void
-ROB<Impl>::incrVul(long vul)
-{
-    robVul += vul;
 }
 
 template <class Impl>

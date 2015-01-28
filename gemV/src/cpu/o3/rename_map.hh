@@ -207,10 +207,10 @@ class UnifiedRenameMap
         RenameInfo info = intMap.rename(rel_arch_reg);
         assert(regFile->isIntPhysReg(info.first));
         //if(this->cpu->renameVulEnable)
-            renameMapVul += renameVulCalc.vulOnWrite(info.first,
-                intMap.numFreeEntries()
-                +floatMap.numFreeEntries()
-                +ccMap.numFreeEntries());              //VUL_RENAME
+        //    renameMapVul += renameVulCalc.vulOnWrite(info.first,
+        //        intMap.numFreeEntries()
+        //        +floatMap.numFreeEntries()
+        //        +ccMap.numFreeEntries());              //VUL_RENAME
         return info;
     }
 
@@ -223,10 +223,10 @@ class UnifiedRenameMap
         RenameInfo info = floatMap.rename(rel_arch_reg);
         assert(regFile->isFloatPhysReg(info.first));
         //if(this->cpu->renameVulEnable)
-            renameMapVul += renameVulCalc.vulOnWrite(info.first,
-                intMap.numFreeEntries()
-                +floatMap.numFreeEntries()
-                +ccMap.numFreeEntries());              //VUL_RENAME
+        //    renameMapVul += renameVulCalc.vulOnWrite(info.first,
+        //        intMap.numFreeEntries()
+        //        +floatMap.numFreeEntries()
+        //        +ccMap.numFreeEntries());              //VUL_RENAME
         return info;
     }
 
@@ -239,10 +239,10 @@ class UnifiedRenameMap
         RenameInfo info = ccMap.rename(rel_arch_reg);
         assert(regFile->isCCPhysReg(info.first));
         //if(this->cpu->renameVulEnable)
-            renameMapVul += renameVulCalc.vulOnWrite(info.first,
-                intMap.numFreeEntries()
-                +floatMap.numFreeEntries()
-                +ccMap.numFreeEntries());              //VUL_RENAME
+        //    renameMapVul += renameVulCalc.vulOnWrite(info.first,
+        //        intMap.numFreeEntries()
+        //        +floatMap.numFreeEntries()
+        //        +ccMap.numFreeEntries());              //VUL_RENAME
         return info;
     }
 
@@ -279,10 +279,10 @@ class UnifiedRenameMap
         PhysRegIndex phys_reg = intMap.lookup(rel_arch_reg);
         assert(regFile->isIntPhysReg(phys_reg));
         //if(this->cpu->renameVulEnable)
-            renameMapVul += renameVulCalc.vulOnRead(phys_reg,                      //VUL_RENAME
-                intMap.numFreeEntries()
-                +floatMap.numFreeEntries()
-                +ccMap.numFreeEntries());              //VUL_RENAME
+        //    renameMapVul += renameVulCalc.vulOnRead(phys_reg,                      //VUL_RENAME
+        //        intMap.numFreeEntries()
+        //        +floatMap.numFreeEntries()
+        //        +ccMap.numFreeEntries());              //VUL_RENAME
         return phys_reg;
     }
 
@@ -295,10 +295,10 @@ class UnifiedRenameMap
         PhysRegIndex phys_reg = floatMap.lookup(rel_arch_reg);
         assert(regFile->isFloatPhysReg(phys_reg));
         //if(this->cpu->renameVulEnable)
-            renameMapVul += renameVulCalc.vulOnRead(phys_reg,                      //VUL_RENAME
-                intMap.numFreeEntries()
-                +floatMap.numFreeEntries()
-                +ccMap.numFreeEntries());              //VUL_RENAME
+        //    renameMapVul += renameVulCalc.vulOnRead(phys_reg,                      //VUL_RENAME
+        //        intMap.numFreeEntries()
+        //        +floatMap.numFreeEntries()
+        //        +ccMap.numFreeEntries());              //VUL_RENAME
         return phys_reg;
     }
 
@@ -311,10 +311,10 @@ class UnifiedRenameMap
         PhysRegIndex phys_reg = ccMap.lookup(rel_arch_reg);
         assert(regFile->isCCPhysReg(phys_reg));
         //if(this->cpu->renameVulEnable)
-            renameMapVul += renameVulCalc.vulOnRead(phys_reg,                      //VUL_RENAME
-                intMap.numFreeEntries()
-                +floatMap.numFreeEntries()
-                +ccMap.numFreeEntries());              //VUL_RENAME
+        //    renameMapVul += renameVulCalc.vulOnRead(phys_reg,                      //VUL_RENAME
+        //        intMap.numFreeEntries()
+        //        +floatMap.numFreeEntries()
+        //        +ccMap.numFreeEntries());              //VUL_RENAME
         return phys_reg;
     }
 
@@ -350,10 +350,10 @@ class UnifiedRenameMap
         assert(regFile->isIntPhysReg(phys_reg));
         intMap.setEntry(arch_reg, phys_reg);
         //if(this->cpu->renameVulEnable)
-            renameVulCalc.vulOnWrite(phys_reg,              //VUL_RENAME
-                intMap.numFreeEntries()
-                +floatMap.numFreeEntries()
-                +ccMap.numFreeEntries());              //VUL_RENAME
+        //    renameVulCalc.vulOnWrite(phys_reg,              //VUL_RENAME
+        //        intMap.numFreeEntries()
+        //        +floatMap.numFreeEntries()
+        //        +ccMap.numFreeEntries());              //VUL_RENAME
     }
 
     /**
@@ -365,10 +365,10 @@ class UnifiedRenameMap
         assert(regFile->isFloatPhysReg(phys_reg));
         floatMap.setEntry(arch_reg, phys_reg);
         //if(this->cpu->renameVulEnable)
-            renameVulCalc.vulOnWrite(phys_reg,              //VUL_RENAME
-                intMap.numFreeEntries()
-                +floatMap.numFreeEntries()
-                +ccMap.numFreeEntries());              //VUL_RENAME
+        //    renameVulCalc.vulOnWrite(phys_reg,              //VUL_RENAME
+        //        intMap.numFreeEntries()
+        //        +floatMap.numFreeEntries()
+        //        +ccMap.numFreeEntries());              //VUL_RENAME
     }
 
     /**
@@ -380,10 +380,10 @@ class UnifiedRenameMap
         assert(regFile->isCCPhysReg(phys_reg));
         ccMap.setEntry(arch_reg, phys_reg);
         //if(this->cpu->renameVulEnable)
-            renameVulCalc.vulOnWrite(phys_reg,              //VUL_RENAME
-                intMap.numFreeEntries()
-                +floatMap.numFreeEntries()
-                +ccMap.numFreeEntries());              //VUL_RENAME
+        //    renameVulCalc.vulOnWrite(phys_reg,              //VUL_RENAME
+        //        intMap.numFreeEntries()
+        //        +floatMap.numFreeEntries()
+        //        +ccMap.numFreeEntries());              //VUL_RENAME
     }
 
     /**
@@ -397,9 +397,9 @@ class UnifiedRenameMap
         return std::min(intMap.numFreeEntries(), floatMap.numFreeEntries());
     }
     
-    Stats::Scalar renameMapVul;                                         //VUL_RENAME
+    //Stats::Scalar renameMapVul;                                         //VUL_RENAME
 
-    RenameVulCalc renameVulCalc;                                        //VUL_RENAME
+    //RenameVulCalc renameVulCalc;                                        //VUL_RENAME
 };
 
 #endif //__CPU_O3_RENAME_MAP_HH__

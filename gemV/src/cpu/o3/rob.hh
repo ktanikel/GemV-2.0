@@ -272,9 +272,6 @@ class ROB
     /** Registers statistics. */
     void regStats();
 
-    /** Function to increment vulnerability */
-    void incrVul(long vul);                         //VUL_ROB
-
   private:
     /** Reset the ROB state */
     void resetState();
@@ -345,8 +342,6 @@ class ROB
     Stats::Scalar robReads;
     // The number of rob_writes
     Stats::Scalar robWrites;
-    //Vulnerability of the ROB in bit-ticks
-    Stats::Scalar robVul;
 };
 
 #endif //__CPU_O3_ROB_HH__

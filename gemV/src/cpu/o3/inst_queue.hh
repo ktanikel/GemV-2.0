@@ -50,6 +50,8 @@
 #include <vector>
 
 #include "base/vulnerability/vul_inst_queue.hh"                     //VUL_IQ
+#include "base/vulnerability/vul_structs.hh"                        //VUL_TRACKER
+
 #include "base/statistics.hh"
 #include "base/types.hh"
 #include "cpu/o3/dep_graph.hh"

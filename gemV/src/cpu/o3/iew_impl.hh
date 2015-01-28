@@ -872,20 +872,9 @@ DefaultIEW<Impl>::sortInsts()
     for (int i = 0; i < insts_from_rename; ++i) {
         insts[fromRename->insts[i]->threadNumber].push(fromRename->insts[i]);
 
-        //VUL_PIPELINE start
-        /*
-        vp->compID = PR_BASE_ID;
-        vp->WriteRead = false;
-        vp->seqNum = fromRename->insts[i]->seqNum;
-        vp->Stage = STAGE_EXECUTE;
-        vp->type = Inst;
-        cpu->vulContainer->registerVulComponentAccess(fromRename->insts[i], vp);
-        vp->type = Ctrl;
-        cpu->vulContainer->registerVulComponentAccess(fromRename->insts[i], vp);
-        vp->type = Data;
-        cpu->vulContainer->registerVulComponentAccess(fromRename->insts[i], vp);
-        */
-        //VUL_PIPELINE end
+        //VUL_TRACKER Reading from Rename Queue
+        if(this->cpu->pipeVulEnable)
+            this->cpu->pipeVulT.vulOnRead(P_RENAMEQ, P_SEQNUM, fromRename->insts[i]->seqNum);
     }
 }
 
@@ -1483,6 +1472,10 @@ DefaultIEW<Impl>::writebackInsts()
                 inst->seqNum, inst->pcState());
 
         iewInstsToCommit[tid]++;
+
+        //VUL_TRACKER
+        if(this->cpu->pipeVulEnable)
+            this->cpu->pipeVulT.vulOnWrite(P_IEWQ, P_SEQNUM, inst->seqNum);
 
         //VUL_PIPELINE start
         /*

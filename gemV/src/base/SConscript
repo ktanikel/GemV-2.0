@@ -105,6 +105,7 @@ DebugFlag('GDBWrite', "Writes to the remote address space")
 DebugFlag('SQL', "SQL queries sent to the server")
 DebugFlag('StatEvents', "Statistics event tracking")
 DebugFlag('VulTracker', "Vulnerability tracker tracking")
+DebugFlag('VulTrackerROB', "Vulnerability tracker tracking")
 
 CompoundFlag('GDBAll',
     [ 'GDBMisc', 'GDBAcc', 'GDBRead', 'GDBWrite', 'GDBSend', 'GDBRecv',

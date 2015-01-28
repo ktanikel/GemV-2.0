@@ -74,9 +74,6 @@
 
 #include "base/vulnerability/vul_tracker.hh"        //VUL_TRACKER
 
-//#include "debug/vulRTL.hh"             //VUL_PIPELINE
-//#include "base/vulnerability/vulnerabilityParams.hh"            //VUL_PIPELINE
-
 using namespace std;
 
 template<class Impl>

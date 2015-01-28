@@ -653,6 +653,11 @@ InstructionQueue<Impl>::getInstToExecute()
     assert(!instsToExecute.empty());
     DynInstPtr inst = instsToExecute.front();
     instsToExecute.pop_front();
+
+    //VUL_TRACKER Read from Issue to Exec
+    if(this->cpu->pipeVulEnable)
+        this->cpu->pipeVulT.vulOnRead(P_I2EQ, P_SEQNUM, inst->seqNum);
+    
     if (inst->isFloating()){
         fpInstQueueReads++;
     } else {
@@ -732,6 +737,10 @@ InstructionQueue<Impl>::processFUCompletion(DynInstPtr &inst, int fu_idx)
     // the queue.
     issueToExecuteQueue->access(-1)->size++;
     instsToExecute.push_back(inst);
+
+    //VUL_TRACKER Write to I2EQueue
+    if(this->cpu->pipeVulEnable)
+        this->cpu->pipeVulT.vulOnWrite(P_I2EQ, P_SEQNUM, inst->seqNum);
 }
 
 // @todo: Figure out a better way to remove the squashed items from the
@@ -752,6 +761,11 @@ InstructionQueue<Impl>::scheduleReadyInsts()
            (deferred_mem_inst = getDeferredMemInstToExecute()) != 0) {
         issueToExecuteQueue->access(0)->size++;
         instsToExecute.push_back(deferred_mem_inst);
+
+        //VUL_TRACKER Write to I2EQueue
+        if(this->cpu->pipeVulEnable)
+            this->cpu->pipeVulT.vulOnWrite(P_I2EQ, P_SEQNUM, deferred_mem_inst->seqNum);
+
         total_deferred_mem_issued++;
     }
 
@@ -815,6 +829,10 @@ InstructionQueue<Impl>::scheduleReadyInsts()
             if (op_latency == Cycles(1)) {
                 i2e_info->size++;
                 instsToExecute.push_back(issuing_inst);
+
+                //VUL_TRACKER Write to I2EQueue
+                if(this->cpu->pipeVulEnable)
+                    this->cpu->pipeVulT.vulOnWrite(P_I2EQ, P_SEQNUM, issuing_inst->seqNum);
 
                 // Add the FU onto the list of FU's to be freed next
                 // cycle if we used one.

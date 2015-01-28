@@ -1019,7 +1019,7 @@ DefaultCommit<Impl>::commitInsts()
                 ++num_committed;
                 
                 if(this->cpu->robVulEnable) 
-                    rob->incrVul(rob->robVulCalc.vulOnCommit(tid, head_inst->seqNum));              //VUL_TRACKER
+                    rob->robVulCalc.vulOnCommit(tid, head_inst->seqNum);              //VUL_TRACKER
 
                 changedROBNumEntries[tid] = true;
 
@@ -1254,6 +1254,7 @@ DefaultCommit<Impl>::commitHead(DynInstPtr &head_inst, unsigned inst_num)
     for (int i = 0; i < head_inst->numDestRegs(); i++) {
         renameMap[tid]->setEntry(head_inst->flattenedDestRegIdx(i),
                                  head_inst->renamedDestRegIdx(i));
+
     }
 
     // Finally clear the head ROB entry.
@@ -1351,6 +1352,10 @@ DefaultCommit<Impl>::markCompletedInsts()
 
             // Mark the instruction as ready to commit.
             fromIEW->insts[inst_num]->setCanCommit();
+            
+            //VUL_TRACKER
+            if(this->cpu->pipeVulEnable)
+                this->cpu->pipeVulT.vulOnRead(P_IEWQ, P_SEQNUM, fromIEW->insts[inst_num]->seqNum);
 
             //VUL_PIPELINE start
             /*

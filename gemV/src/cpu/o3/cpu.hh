@@ -72,6 +72,7 @@
 #include "base/vulnerability/vul_tracker.hh"                    //VUL_TRACKER
 #include "base/vulnerability/vul_structs.hh"                    //VUL_TRACKER
 #include "base/vulnerability/vul_pipeline.hh"                   //VUL_TRACKER
+#include "base/vulnerability/vul_rename.hh"                   //VUL_TRACKER
 
 template <class>
 class Checker;
@@ -814,6 +815,9 @@ class FullO3CPU : public BaseO3CPU
     /** Fetch Queue vulnerability calculator */
     PipeVulTracker pipeVulT;
 
+    /** Fetch Queue vulnerability calculator */
+    RenameVulCalc renameVulT;
+
     /** Enable/disable vulnerability analysis */
     bool enableVulAnalysis;                                 //VUL_TRACKER
 
@@ -907,10 +911,6 @@ class FullO3CPU : public BaseO3CPU
     Stats::Scalar miscRegfileReads;
     Stats::Scalar miscRegfileWrites;
 
-    // Vulnerability of commit rename map
-    Stats::Formula commitRenameMapVul;                          //VUL_RENAME
-    //Vulnerability of the Fetch Queue
-    Stats::Scalar fetchQueueVul;                                //VUL_TRACKER
 };
 
 #endif // __CPU_O3_CPU_HH__
