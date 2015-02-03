@@ -1120,8 +1120,9 @@ DefaultFetch<Impl>::buildInst(ThreadID tid, StaticInstPtr staticInst,
     toDecode->insts[toDecode->size++] = instruction;
 
     //VUL_TRACKER Writing to Fetch Queue
-    if(this->cpu->pipeVulEnable)
-        this->cpu->pipeVulT.vulOnWrite(P_FETCHQ, P_SEQNUM, instruction->seqNum);
+    if(this->cpu->pipeVulEnable) {
+        this->cpu->pipeVulT.vulOnWrite(P_FETCHQ, INST_OPCODE, instruction->seqNum);
+    }
 
     // Keep track of if we can take an interrupt at this boundary
     delayedCommit[tid] = instruction->isDelayedCommit();

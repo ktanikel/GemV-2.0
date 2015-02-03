@@ -48,7 +48,6 @@
 #include "base/statistics.hh"
 #include "config/the_isa.hh"
 #include "cpu/timebuf.hh"
-#include "base/vulnerability/vul_histbuf.hh"        //VUL_RENAME
 
 struct DerivO3CPUParams;
 
@@ -121,8 +120,6 @@ class DefaultRename
     ThreadStatus renameStatus[Impl::MaxThreads];
 
   public:
-    /** VUL_RENAME Vulnerability calculator of the history buffer */
-    HistbufVulCalc histbufVulCalc;
 
     /** DefaultRename constructor. */
     DefaultRename(O3CPU *_cpu, DerivO3CPUParams *params);
@@ -498,10 +495,6 @@ class DefaultRename
     Stats::Scalar renamedTempSerializing;
     /** Number of instructions inserted into skid buffers. */
     Stats::Scalar renameSkidInsts;
-    /** Vulnerability of the rename map */
-    //Stats::Formula renameMapVul;                                     //VUL_RENAME
-    /** Vulnerability of the history buffer */
-    Stats::Scalar histbufVul;                                       //VUL_RENAME
 };
 
 #endif // __CPU_O3_RENAME_HH__

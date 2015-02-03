@@ -375,8 +375,8 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
             renameMap[tid].setIntEntry(ridx, phys_reg);
 
             //VUL_TRACKER Write to Rename map
-            //if(this->renameVulEnable)
-            //    this->renameVulT.vulOnWrite(ridx, 0, tid);
+            if(this->renameVulEnable)
+                this->renameVulT.vulOnWrite(ridx, 0, tid);
 
             commitRenameMap[tid].setIntEntry(ridx, phys_reg);
         }
@@ -386,8 +386,8 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
             renameMap[tid].setFloatEntry(ridx, phys_reg);
 
             //VUL_TRACKER Write to Rename map
-            //if(this->renameVulEnable)
-            //    this->renameVulT.vulOnWrite((int)(ridx + TheISA::NumIntRegs), 0, tid);
+            if(this->renameVulEnable)
+                this->renameVulT.vulOnWrite((int)(ridx + TheISA::NumIntRegs), 0, tid);
 
             commitRenameMap[tid].setFloatEntry(ridx, phys_reg);
         }
@@ -397,8 +397,8 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
             renameMap[tid].setCCEntry(ridx, phys_reg);
 
             //VUL_TRACKER Write to Rename map
-            //if(this->renameVulEnable)
-            //    this->renameVulT.vulOnWrite((int)(ridx + TheISA::NumIntRegs + TheISA::NumFloatRegs), 0, tid);
+            if(this->renameVulEnable)
+                this->renameVulT.vulOnWrite((int)(ridx + TheISA::NumIntRegs + TheISA::NumFloatRegs), 0, tid);
 
 
             commitRenameMap[tid].setCCEntry(ridx, phys_reg);
@@ -1837,6 +1837,9 @@ FullO3CPU<Impl>::cleanUpRemovedInsts()
         if((*removeList.front())->isSquashed() || !(*removeList.front())->isCommitted()) {
             if(rfVulEnable)
                 regVulCalc.clearSquashedAccess((*removeList.front())->seqNum);
+            if(renameVulEnable)
+                renameVulT.vulOnCommitHB((*removeList.front())->seqNum,
+                                    (*removeList.front())->threadNumber);
 
 
         } else if((*removeList.front())->isCommitted()) {
@@ -1849,14 +1852,13 @@ FullO3CPU<Impl>::cleanUpRemovedInsts()
                         pipeVulT.vulOnSquash(P_I2EQ, (*removeList.front())->seqNum);
                         pipeVulT.vulOnSquash(P_IEWQ, (*removeList.front())->seqNum);
                     } 
-                    if(renameVulEnable) {
-                        renameVulT.vulOnSquash((*removeList.front())->seqNum, 
-                                    (*removeList.front())->threadNumber);
-                    }
                     if(rfVulEnable)
                         regVulCalc.clearSquashedAccess((*removeList.front())->seqNum);
+                    if(renameVulEnable)
+                        renameVulT.vulOnCommitHB((*removeList.front())->seqNum,
+                                    (*removeList.front())->threadNumber);
                     
-                } else if ((*removeList.front())->isCommitted()) {
+                } else {
 
                     if(pipeVulEnable) {
                         pipeVulT.vulOnCommit(P_FETCHQ, (*removeList.front())->seqNum);
@@ -1864,13 +1866,12 @@ FullO3CPU<Impl>::cleanUpRemovedInsts()
                         pipeVulT.vulOnCommit(P_RENAMEQ, (*removeList.front())->seqNum);
                         pipeVulT.vulOnCommit(P_I2EQ, (*removeList.front())->seqNum);
                         pipeVulT.vulOnCommit(P_IEWQ, (*removeList.front())->seqNum);
-                    }
+                    } 
                     if(renameVulEnable) {
-                        renameVulT.vulOnCommit((*removeList.front())->seqNum, 
+                        renameVulT.vulOnCommit((*removeList.front())->seqNum,
                                     (*removeList.front())->threadNumber);
                     }
                 }
-
         }
 
         instList.erase(removeList.front());
