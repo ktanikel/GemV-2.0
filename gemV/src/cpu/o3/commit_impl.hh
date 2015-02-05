@@ -1353,9 +1353,12 @@ DefaultCommit<Impl>::markCompletedInsts()
             // Mark the instruction as ready to commit.
             fromIEW->insts[inst_num]->setCanCommit();
             
-            //VUL_TRACKER
-            if(this->cpu->pipeVulEnable)
-                this->cpu->pipeVulT.vulOnRead(P_IEWQ, P_SEQNUM, fromIEW->insts[inst_num]->seqNum);
+            //VUL_TRACKER Read IEWQ
+            if(this->cpu->pipeVulEnable) {
+                this->cpu->pipeVulT.vulOnRead(P_IEWQ, INST_PC, fromIEW->insts[inst_num]->seqNum);
+                this->cpu->pipeVulT.vulOnRead(P_IEWQ, INST_SEQNUM, fromIEW->insts[inst_num]->seqNum);
+                this->cpu->pipeVulT.vulOnRead(P_IEWQ, INST_FLAGS, fromIEW->insts[inst_num]->seqNum);
+            }
 
             //VUL_PIPELINE start
             /*

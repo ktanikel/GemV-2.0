@@ -387,6 +387,8 @@ DefaultFetch<Impl>::processCacheCompletion(PacketPtr pkt)
     memcpy(fetchBuffer[tid], pkt->getPtr<uint8_t>(), fetchBufferSize);
     fetchBufferValid[tid] = true;
 
+    // VUL_FETCHBUFFER This is where fetch buffer is written
+
     // Wake up the CPU (if it went to sleep and was waiting on
     // this completion event).
     cpu->wakeCPU();
@@ -1122,6 +1124,11 @@ DefaultFetch<Impl>::buildInst(ThreadID tid, StaticInstPtr staticInst,
     //VUL_TRACKER Writing to Fetch Queue
     if(this->cpu->pipeVulEnable) {
         this->cpu->pipeVulT.vulOnWrite(P_FETCHQ, INST_OPCODE, instruction->seqNum);
+        this->cpu->pipeVulT.vulOnWrite(P_FETCHQ, INST_PC, instruction->seqNum);
+        this->cpu->pipeVulT.vulOnWrite(P_FETCHQ, INST_SEQNUM, instruction->seqNum);
+        this->cpu->pipeVulT.vulOnWrite(P_FETCHQ, INST_FLAGS, instruction->seqNum);
+        this->cpu->pipeVulT.vulOnWrite(P_FETCHQ, INST_ARCHSRCREGSIDX, instruction->seqNum);
+        this->cpu->pipeVulT.vulOnWrite(P_FETCHQ, INST_ARCHDESTREGSIDX, instruction->seqNum);
     }
 
     // Keep track of if we can take an interrupt at this boundary
@@ -1233,13 +1240,6 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 
     const unsigned numInsts = fetchBufferSize / instSize;
     unsigned blkOffset = (fetchAddr - fetchBufferPC[tid]) / instSize;
-
-    //VUL_PIPELINE start
-    /*
-    vulParams vtemp = {0,false,false,0,0,0};
-    vulParams *vp = &vtemp;
-    */
-    //VUL_PIPELINE end
 
     // Loop through instruction memory from the cache.
     // Keep issuing while fetchWidth is available and branch is not

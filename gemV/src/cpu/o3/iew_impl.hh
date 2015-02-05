@@ -873,8 +873,14 @@ DefaultIEW<Impl>::sortInsts()
         insts[fromRename->insts[i]->threadNumber].push(fromRename->insts[i]);
 
         //VUL_TRACKER Reading from Rename Queue
-        if(this->cpu->pipeVulEnable)
-            this->cpu->pipeVulT.vulOnRead(P_RENAMEQ, P_SEQNUM, fromRename->insts[i]->seqNum);
+        if(this->cpu->pipeVulEnable) {
+            this->cpu->pipeVulT.vulOnRead(P_RENAMEQ, INST_OPCODE, fromRename->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_RENAMEQ, INST_PC, fromRename->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_RENAMEQ, INST_SEQNUM, fromRename->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_RENAMEQ, INST_FLAGS, fromRename->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_RENAMEQ, INST_PHYSRCREGSIDX, fromRename->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_RENAMEQ, INST_PHYDESTREGSIDX, fromRename->insts[i]->seqNum);
+        }
     }
 }
 
@@ -1451,13 +1457,6 @@ template <class Impl>
 void
 DefaultIEW<Impl>::writebackInsts()
 {
-    //VUL_PIPELINE start
-    /*
-    vulParams vtemp = {0,false,false,0,0,0};
-    vulParams *vp = &vtemp;
-    */
-    //VUL_PIPELINE end
-
     // Loop through the head of the time buffer and wake any
     // dependents.  These instructions are about to write back.  Also
     // mark scoreboard that this instruction is finally complete.
@@ -1474,24 +1473,12 @@ DefaultIEW<Impl>::writebackInsts()
         iewInstsToCommit[tid]++;
 
         //VUL_TRACKER
-        if(this->cpu->pipeVulEnable)
-            this->cpu->pipeVulT.vulOnWrite(P_IEWQ, P_SEQNUM, inst->seqNum);
+        if(this->cpu->pipeVulEnable) {
+            this->cpu->pipeVulT.vulOnWrite(P_IEWQ, INST_PC, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_IEWQ, INST_SEQNUM, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_IEWQ, INST_FLAGS, inst->seqNum);
+        }
 
-        //VUL_PIPELINE start
-        /*
-        vp->compID = PR_BASE_ID;
-        vp->WriteRead = true;
-        vp->seqNum = inst->seqNum;
-        vp->Stage = STAGE_WB;
-        vp->type = Inst;
-        cpu->vulContainer->registerVulComponentAccess(inst, vp);
-        vp->type = Ctrl;
-        cpu->vulContainer->registerVulComponentAccess(inst, vp);
-        vp->type = Data;
-        cpu->vulContainer->registerVulComponentAccess(inst, vp);
-        */
-        //VUL_PIPELINE end
-  
         // Some instructions will be sent to commit without having
         // executed because they need commit to handle them.
         // E.g. Uncached loads have not actually executed when they

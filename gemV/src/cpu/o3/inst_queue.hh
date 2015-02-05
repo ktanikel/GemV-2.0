@@ -49,7 +49,6 @@
 #include <queue>
 #include <vector>
 
-#include "base/vulnerability/vul_inst_queue.hh"                     //VUL_IQ
 #include "base/vulnerability/vul_structs.hh"                        //VUL_TRACKER
 
 #include "base/statistics.hh"
@@ -424,9 +423,6 @@ class InstructionQueue
      */
     Cycles commitToIEWDelay;
 
-    /** Instruction queue vulnerability calculator */
-    InstQueueVulCalc iqVulCalc;
-
     /** The sequence number of the squashed instruction. */
     InstSeqNum squashedSeqNum[Impl::MaxThreads];
 
@@ -519,10 +515,8 @@ class InstructionQueue
     Stats::Vector fuBusy;
     /** Number of times the FU was busy per instruction issued. */
     Stats::Formula fuBusyRate;
-    /** Vulnerability of the instruction queue in bit-ticks */
-    Stats::Scalar instQueueVul;                     //VUL_IQ
-
-   public:
+   
+  public:
     Stats::Scalar intInstQueueReads;
     Stats::Scalar intInstQueueWrites;
     Stats::Scalar intInstQueueWakeupAccesses;

@@ -1857,20 +1857,29 @@ FullO3CPU<Impl>::cleanUpRemovedInsts()
                     if(renameVulEnable)
                         renameVulT.vulOnCommitHB((*removeList.front())->seqNum,
                                     (*removeList.front())->threadNumber);
+                    if(iqVulEnable)
+                        pipeVulT.vulOnSquash(P_IQ, (*removeList.front())->seqNum);
+                    if(lsqVulEnable)
+                        pipeVulT.vulOnSquash(P_LSQ, (*removeList.front())->seqNum);
                     
                 } else {
 
                     if(pipeVulEnable) {
-                        pipeVulT.vulOnCommit(P_FETCHQ, (*removeList.front())->seqNum);
-                        pipeVulT.vulOnCommit(P_DECODEQ, (*removeList.front())->seqNum);
-                        pipeVulT.vulOnCommit(P_RENAMEQ, (*removeList.front())->seqNum);
-                        pipeVulT.vulOnCommit(P_I2EQ, (*removeList.front())->seqNum);
-                        pipeVulT.vulOnCommit(P_IEWQ, (*removeList.front())->seqNum);
+                        pipeVulT.vulOnCommit(P_FETCHQ, (*removeList.front())->seqNum, (*removeList.front())->numSrcRegs(), (*removeList.front())->numDestRegs());
+                        pipeVulT.vulOnCommit(P_DECODEQ, (*removeList.front())->seqNum, (*removeList.front())->numSrcRegs(), (*removeList.front())->numDestRegs());
+                        pipeVulT.vulOnCommit(P_RENAMEQ, (*removeList.front())->seqNum, (*removeList.front())->numSrcRegs(), (*removeList.front())->numDestRegs());
+                        pipeVulT.vulOnCommit(P_I2EQ, (*removeList.front())->seqNum, (*removeList.front())->numSrcRegs(), (*removeList.front())->numDestRegs());
+                        pipeVulT.vulOnCommit(P_IEWQ, (*removeList.front())->seqNum, (*removeList.front())->numSrcRegs(), (*removeList.front())->numDestRegs());
                     } 
                     if(renameVulEnable) {
                         renameVulT.vulOnCommit((*removeList.front())->seqNum,
                                     (*removeList.front())->threadNumber);
                     }
+                    if(iqVulEnable) {
+                        pipeVulT.vulOnCommit(P_IQ, (*removeList.front())->seqNum, (*removeList.front())->numSrcRegs(), (*removeList.front())->numDestRegs());
+                    }
+                    if(lsqVulEnable)
+                        pipeVulT.vulOnCommit(P_LSQ, (*removeList.front())->seqNum, (*removeList.front())->numSrcRegs(), (*removeList.front())->numDestRegs());
                 }
         }
 

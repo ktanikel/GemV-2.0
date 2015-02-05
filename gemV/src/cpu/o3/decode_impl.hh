@@ -473,8 +473,14 @@ DefaultDecode<Impl>::sortInsts()
         insts[fromFetch->insts[i]->threadNumber].push(fromFetch->insts[i]);
 
         //VUL_TRACKER Reading from Fetch Queue
-        if(this->cpu->pipeVulEnable)
-            this->cpu->pipeVulT.vulOnRead(P_FETCHQ, P_SEQNUM, fromFetch->insts[i]->seqNum);
+        if(this->cpu->pipeVulEnable) {
+            this->cpu->pipeVulT.vulOnRead(P_FETCHQ, INST_OPCODE, fromFetch->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_FETCHQ, INST_PC, fromFetch->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_FETCHQ, INST_SEQNUM, fromFetch->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_FETCHQ, INST_FLAGS, fromFetch->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_FETCHQ, INST_ARCHSRCREGSIDX, fromFetch->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_FETCHQ, INST_ARCHDESTREGSIDX, fromFetch->insts[i]->seqNum);
+        }
     }
 }
 
@@ -735,8 +741,14 @@ DefaultDecode<Impl>::decodeInsts(ThreadID tid)
         --insts_available;
 
         //VUL_TRACKER Writing to decode Queue
-        if(this->cpu->pipeVulEnable)
-            this->cpu->pipeVulT.vulOnWrite(P_DECODEQ, P_SEQNUM, inst->seqNum);
+        if(this->cpu->pipeVulEnable) {
+            this->cpu->pipeVulT.vulOnWrite(P_DECODEQ, INST_OPCODE, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_DECODEQ, INST_PC, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_DECODEQ, INST_SEQNUM, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_DECODEQ, INST_FLAGS, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_DECODEQ, INST_ARCHSRCREGSIDX, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_DECODEQ, INST_ARCHDESTREGSIDX, inst->seqNum);
+        }
 
 #if TRACING_ON
         if (DTRACE(O3PipeView)) {

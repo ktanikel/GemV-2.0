@@ -61,7 +61,6 @@
 #include "mem/packet.hh"
 #include "mem/port.hh"
 #include "sim/fault_fwd.hh"
-#include "base/vulnerability/vul_ls_queue.hh"
 
 struct DerivO3CPUParams;
 
@@ -87,8 +86,6 @@ class LSQUnit {
     typedef typename Impl::CPUPol::IssueStruct IssueStruct;
 
   public:
-    /** LSQ unit vulnerability calculator */
-    LSQueueVulCalc lsqVulCalc;                  //VUL_LSQ
     /** Constructs an LSQ unit. init() must be called prior to use. */
     LSQUnit();
 
@@ -525,9 +522,6 @@ class LSQUnit {
 
     /** Number of times the LSQ is blocked due to the cache. */
     Stats::Scalar lsqCacheBlocked;
-
-    /** Vulnerability of the LSQ Unit */
-    Stats::Scalar lsqVulnerability;                     //VUL_LSQ
 
   public:
     /** Executes the load at the given index. */

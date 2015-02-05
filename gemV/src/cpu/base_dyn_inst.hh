@@ -177,6 +177,7 @@ class BaseDynInst : public RefCounted
     /** VUL_TRACKER */
     VulTracker vulT;
 
+
   protected:
     /** The result of the instruction; assumes an instruction can have many
      *  destination registers.
@@ -240,6 +241,16 @@ class BaseDynInst : public RefCounted
     /** Store queue index. */
     int16_t sqIdx;
 
+    /** VUL_TRACKER Who is accessing? */
+    enum Accessor {
+        OTHERS,
+        INST_Q,
+        LS_Q
+    };
+
+    /** VUL_TRACKER Who is accessing? */
+    Accessor accessor;
+
 
     /////////////////////// TLB Miss //////////////////////
     /**
@@ -271,10 +282,18 @@ class BaseDynInst : public RefCounted
      */
     PhysRegIndex _destRegIdx[TheISA::MaxInstDestRegs];
 
+    //VUL_TRACKER
+    PhysRegIndex _destRegIdxIQ[TheISA::MaxInstDestRegs];
+    PhysRegIndex _destRegIdxLSQ[TheISA::MaxInstDestRegs];
+
     /** Physical register index of the source registers of this
      *  instruction.
      */
     PhysRegIndex _srcRegIdx[TheISA::MaxInstSrcRegs];
+
+    //VUL_TRACKER
+    PhysRegIndex _srcRegIdxIQ[TheISA::MaxInstSrcRegs];
+    PhysRegIndex _srcRegIdxLSQ[TheISA::MaxInstSrcRegs];
 
     /** Physical register index of the previous producers of the
      *  architected destinations.
@@ -373,7 +392,7 @@ class BaseDynInst : public RefCounted
     PhysRegIndex renamedDestRegIdx(int idx)
     {
         //VUL_TRACKER
-        vulT.vulOnRead(INST_RNMDESTREGSIDX, this->seqNum, idx);
+        //vulT.vulOnRead(INST_RNMDESTREGSIDX, this->seqNum, idx);
         return _destRegIdx[idx];
     }
 
@@ -382,7 +401,7 @@ class BaseDynInst : public RefCounted
     {
         assert(TheISA::MaxInstSrcRegs > idx);
         //VUL_TRACKER
-        vulT.vulOnRead(INST_RNMSRCREGSIDX, this->seqNum, idx);
+        //vulT.vulOnRead(INST_RNMSRCREGSIDX, this->seqNum, idx);
         return _srcRegIdx[idx];
     }
 
@@ -391,7 +410,7 @@ class BaseDynInst : public RefCounted
      */
     TheISA::RegIndex flattenedDestRegIdx(int idx)
     {
-        vulT.vulOnRead(INST_FLTDESTREGSIDX, this->seqNum, idx);
+        //vulT.vulOnRead(INST_FLTDESTREGSIDX, this->seqNum, idx);
         return _flatDestRegIdx[idx];
     }
 
@@ -400,7 +419,7 @@ class BaseDynInst : public RefCounted
      */
     PhysRegIndex prevDestRegIdx(int idx)
     {
-        vulT.vulOnRead(INST_PRVDESTREGSIDX, this->seqNum, idx);
+        //vulT.vulOnRead(INST_PRVDESTREGSIDX, this->seqNum, idx);
         return _prevDestRegIdx[idx];
     }
 
@@ -412,10 +431,12 @@ class BaseDynInst : public RefCounted
                        PhysRegIndex previous_rename)
     {
         _destRegIdx[idx] = renamed_dest;
-        _prevDestRegIdx[idx] = previous_rename;
+        _destRegIdxIQ[idx] = renamed_dest;                  //VUL_RENAME
+        _destRegIdxLSQ[idx] = renamed_dest;                 //VUL_RENAME
+        _prevDestRegIdx[idx] = previous_rename;                 
         //VUL_TRACKER
-        vulT.vulOnWrite(INST_RNMDESTREGSIDX, this->seqNum, idx);
-        vulT.vulOnWrite(INST_PRVDESTREGSIDX, this->seqNum, idx);
+        //vulT.vulOnWrite(INST_RNMDESTREGSIDX, this->seqNum, idx);
+        //vulT.vulOnWrite(INST_PRVDESTREGSIDX, this->seqNum, idx);
     }
 
     /** Renames a source logical register to the physical register which
@@ -425,8 +446,10 @@ class BaseDynInst : public RefCounted
     void renameSrcReg(int idx, PhysRegIndex renamed_src)
     {
         _srcRegIdx[idx] = renamed_src;
+        _srcRegIdxIQ[idx] = renamed_src;                    //VUL_RENAME
+        _srcRegIdxLSQ[idx] = renamed_src;                   //VUL_RENAME
         //VUL_TRACKER
-        vulT.vulOnWrite(INST_RNMSRCREGSIDX, this->seqNum, idx);
+        //vulT.vulOnWrite(INST_RNMSRCREGSIDX, this->seqNum, idx);
     }
 
     /** Flattens a destination architectural register index into a logical
@@ -436,7 +459,7 @@ class BaseDynInst : public RefCounted
     {
         _flatDestRegIdx[idx] = flattened_dest;
         //VUL_TRACKER
-        vulT.vulOnWrite(INST_FLTDESTREGSIDX, this->seqNum, idx);
+        //vulT.vulOnWrite(INST_FLTDESTREGSIDX, this->seqNum, idx);
     }
     /** BaseDynInst constructor given a binary instruction.
      *  @param staticInst A StaticInstPtr to the underlying instruction.
@@ -491,13 +514,13 @@ class BaseDynInst : public RefCounted
     void setPredTarg(const TheISA::PCState &_predPC)
     {
         //VUL_TRACKER
-        vulT.vulOnWrite(INST_PREDPC, this->seqNum);
+        //vulT.vulOnWrite(INST_PREDPC, this->seqNum);
         predPC = _predPC;
     }
 
     const TheISA::PCState &readPredTarg() { 
         //VUL_TRACKER
-        vulT.vulOnRead(INST_PREDPC, this->seqNum);
+        //vulT.vulOnRead(INST_PREDPC, this->seqNum);
         return predPC; }
 
     /** Returns the predicted PC immediately after the branch. */
@@ -821,7 +844,7 @@ class BaseDynInst : public RefCounted
     /** Read the PC state of this instruction. */
     const TheISA::PCState pcState() { 
         //VUL_TRACKER
-        vulT.vulOnRead(INST_PC, this->seqNum);
+        //vulT.vulOnRead(INST_PC, this->seqNum);
         return pc; 
     }
 

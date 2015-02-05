@@ -675,8 +675,14 @@ DefaultRename<Impl>::renameInsts(ThreadID tid)
         --insts_available;
 
         //VUL_TRACKER Writing to Rename Queue
-        if(this->cpu->pipeVulEnable)
-            this->cpu->pipeVulT.vulOnWrite(P_RENAMEQ, P_SEQNUM, inst->seqNum);
+        if(this->cpu->pipeVulEnable) {
+            this->cpu->pipeVulT.vulOnWrite(P_RENAMEQ, INST_OPCODE, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_RENAMEQ, INST_PC, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_RENAMEQ, INST_SEQNUM, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_RENAMEQ, INST_FLAGS, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_RENAMEQ, INST_PHYSRCREGSIDX, inst->seqNum);
+            this->cpu->pipeVulT.vulOnWrite(P_RENAMEQ, INST_PHYDESTREGSIDX, inst->seqNum);
+        }
     }
 
     instsInProgress[tid] += renamed_insts;
@@ -745,8 +751,14 @@ DefaultRename<Impl>::sortInsts()
         insts[inst->threadNumber].push_back(inst);
 
         //VUL_TRACKER Reading from Decode Queue
-        if(this->cpu->pipeVulEnable)
-            this->cpu->pipeVulT.vulOnRead(P_DECODEQ, P_SEQNUM, fromDecode->insts[i]->seqNum);
+        if(this->cpu->pipeVulEnable) {
+            this->cpu->pipeVulT.vulOnRead(P_DECODEQ, INST_OPCODE, fromDecode->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_DECODEQ, INST_PC, fromDecode->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_DECODEQ, INST_SEQNUM, fromDecode->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_DECODEQ, INST_FLAGS, fromDecode->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_DECODEQ, INST_ARCHSRCREGSIDX, fromDecode->insts[i]->seqNum);
+            this->cpu->pipeVulT.vulOnRead(P_DECODEQ, INST_ARCHDESTREGSIDX, fromDecode->insts[i]->seqNum);
+        }
 
 #if TRACING_ON
         if (DTRACE(O3PipeView)) {
