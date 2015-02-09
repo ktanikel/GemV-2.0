@@ -159,6 +159,18 @@ class BaseDynInst : public RefCounted
     /** The sequence number of the instruction. */
     InstSeqNum seqNum;
 
+    /** VUL_TRACKER The sequence number of the instruction. */
+    InstSeqNum seqNumROB;
+
+    /** VUL_TRACKER The sequence number of the instruction. */
+    InstSeqNum seqNumIQ;
+
+    /** VUL_TRACKER The sequence number of the instruction. */
+    InstSeqNum seqNumLSQ;
+
+    /** VUL_TRACKER The sequence number of the instruction. */
+    InstSeqNum seqNumIEWQ;
+
     /** The StaticInst used by this BaseDynInst. */
     StaticInstPtr staticInst;
 
@@ -186,6 +198,9 @@ class BaseDynInst : public RefCounted
 
     /** PC state for this instruction. */
     TheISA::PCState pc;
+
+    /** VUL_TRACKER PC state for this instruction. */
+    TheISA::PCState pcROB;
 
     /* An amalgamation of a lot of boolean values into one */
     std::bitset<MaxFlags> instFlags;
@@ -245,7 +260,8 @@ class BaseDynInst : public RefCounted
     enum Accessor {
         OTHERS,
         INST_Q,
-        LS_Q
+        LS_Q,
+        ROB
     };
 
     /** VUL_TRACKER Who is accessing? */
@@ -844,21 +860,44 @@ class BaseDynInst : public RefCounted
     /** Read the PC state of this instruction. */
     const TheISA::PCState pcState() { 
         //VUL_TRACKER
-        //vulT.vulOnRead(INST_PC, this->seqNum);
+        if(this->accessor == ROB)
+            return pcROB;
+
         return pc; 
     }
 
     /** Set the PC state of this instruction. */
-    const void pcState(const TheISA::PCState &val) { pc = val; }
+    const void pcState(const TheISA::PCState &val) { 
+        pc = val;
+        pcROB = val;
+    }
 
     /** Read the PC of this instruction. */
-    const Addr instAddr() const { return pc.instAddr(); }
+    const Addr instAddr() const { 
+        //VUL_TRACKER
+        if(this->accessor == ROB)
+           return pcROB.instAddr();
+
+        return pc.instAddr(); 
+    }
 
     /** Read the PC of the next instruction. */
-    const Addr nextInstAddr() const { return pc.nextInstAddr(); }
+    const Addr nextInstAddr() const { 
+        //VUL_TRACKER
+        if(this->accessor == ROB)
+            return pcROB.nextInstAddr();
+
+        return pc.nextInstAddr();
+    }
 
     /**Read the micro PC of this instruction. */
-    const Addr microPC() const { return pc.microPC(); }
+    const Addr microPC() const { 
+        //VUL_TRACKER
+        if(this->accessor == ROB)
+            return pcROB.microPC();
+        
+        return pc.microPC(); 
+    }
 
     bool readPredicate()
     {
