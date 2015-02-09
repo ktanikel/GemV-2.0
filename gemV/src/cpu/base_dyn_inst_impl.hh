@@ -75,6 +75,10 @@ BaseDynInst<Impl>::BaseDynInst(StaticInstPtr _staticInst,
     seqNumIEWQ = seq_num;
 
     pc = _pc;
+
+    //VUL_TRACKER
+    pcROB = _pc;
+
     predPC = _predPC;
 
     initVars();
