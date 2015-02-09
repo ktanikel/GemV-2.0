@@ -689,7 +689,7 @@ InstructionQueue<Impl>::addToOrderList(OpClass op_class)
 
     queue_entry.queueType = op_class;
 
-    queue_entry.oldestInst = readyInsts[op_class].top()->seqNum;
+    queue_entry.oldestInst = readyInsts[op_class].top()->seqNumIQ;
 
     ListOrderIt list_it = listOrder.begin();
     ListOrderIt list_end_it = listOrder.end();
@@ -722,7 +722,7 @@ InstructionQueue<Impl>::moveToYoungerInst(ListOrderIt list_order_it)
     ++next_it;
 
     queue_entry.queueType = op_class;
-    queue_entry.oldestInst = readyInsts[op_class].top()->seqNum;
+    queue_entry.oldestInst = readyInsts[op_class].top()->seqNumIQ;
 
     while (next_it != listOrder.end() &&
            (*next_it).oldestInst < queue_entry.oldestInst) {
@@ -817,7 +817,7 @@ InstructionQueue<Impl>::scheduleReadyInsts()
 
         issuing_inst->isFloating() ? fpInstQueueReads++ : intInstQueueReads++;
 
-        assert(issuing_inst->seqNum == (*order_it).oldestInst);
+        assert(issuing_inst->seqNumIQ == (*order_it).oldestInst);
 
         if (issuing_inst->isSquashed()) {
             readyInsts[op_class].pop();
@@ -892,7 +892,7 @@ InstructionQueue<Impl>::scheduleReadyInsts()
             DPRINTF(IQ, "Thread %i: Issuing instruction PC %s "
                     "[sn:%lli]\n",
                     tid, issuing_inst->pcState(),
-                    issuing_inst->seqNum);
+                    issuing_inst->seqNumIQ);
 
             readyInsts[op_class].pop();
 
@@ -933,7 +933,7 @@ InstructionQueue<Impl>::scheduleReadyInsts()
 
             listOrder.erase(order_it++);
             statIssuedInstType[tid][op_class]++;
-            iewStage->incrWb(issuing_inst->seqNum);
+            iewStage->incrWb(issuing_inst->seqNumIQ);
         } else {
             statFuBusy[op_class]++;
             fuBusy[tid]++;
@@ -993,7 +993,7 @@ InstructionQueue<Impl>::commit(const InstSeqNum &inst, ThreadID tid)
     ListIt iq_it = instList[tid].begin();
 
     while (iq_it != instList[tid].end() &&
-           (*iq_it)->seqNum <= inst) {
+           (*iq_it)->seqNumIQ <= inst) {
         ++iq_it;
         instList[tid].pop_front();
     }
@@ -1095,7 +1095,7 @@ InstructionQueue<Impl>::addReadyMemInst(DynInstPtr &ready_inst)
     // or it has an older instruction than last time.
     if (!queueOnList[op_class]) {
         addToOrderList(op_class);
-    } else if (readyInsts[op_class].top()->seqNum  <
+    } else if (readyInsts[op_class].top()->seqNumIQ  <
                (*readyIt[op_class]).oldestInst) {
         listOrder.erase(readyIt[op_class]);
         addToOrderList(op_class);
@@ -1218,7 +1218,7 @@ InstructionQueue<Impl>::doSquash(ThreadID tid)
     // Squash any instructions younger than the squashed sequence number
     // given.
     while (squash_it != instList[tid].end() &&
-           (*squash_it)->seqNum > squashedSeqNum[tid]) {
+           (*squash_it)->seqNumIQ > squashedSeqNum[tid]) {
 
         DynInstPtr squashed_inst = (*squash_it);
         squashed_inst->isFloating() ? fpInstQueueWrites++ : intInstQueueWrites++;
@@ -1236,7 +1236,7 @@ InstructionQueue<Impl>::doSquash(ThreadID tid)
              !squashed_inst->memOpDone())) {
 
             DPRINTF(IQ, "[tid:%i]: Instruction [sn:%lli] PC %s squashed.\n",
-                    tid, squashed_inst->seqNum, squashed_inst->pcState());
+                    tid, squashed_inst->seqNumIQ, squashed_inst->pcState());
 
             // Remove the instruction from the dependency list.
             if (!squashed_inst->isNonSpeculative() &&
@@ -1271,7 +1271,7 @@ InstructionQueue<Impl>::doSquash(ThreadID tid)
             } else if (!squashed_inst->isStoreConditional() ||
                        !squashed_inst->isCompleted()) {
                 NonSpecMapIt ns_inst_it =
-                    nonSpecInsts.find(squashed_inst->seqNum);
+                    nonSpecInsts.find(squashed_inst->seqNumIQ);
 
                 if (ns_inst_it == nonSpecInsts.end()) {
                     assert(squashed_inst->getFault() != NoFault);
@@ -1421,7 +1421,7 @@ InstructionQueue<Impl>::addIfReady(DynInstPtr &inst)
         // or it has an older instruction than last time.
         if (!queueOnList[op_class]) {
             addToOrderList(op_class);
-        } else if (readyInsts[op_class].top()->seqNum  <
+        } else if (readyInsts[op_class].top()->seqNumIQ  <
                    (*readyIt[op_class]).oldestInst) {
             listOrder.erase(readyIt[op_class]);
             addToOrderList(op_class);

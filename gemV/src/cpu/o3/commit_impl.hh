@@ -1295,6 +1295,10 @@ DefaultCommit<Impl>::getInsts()
         DynInstPtr inst;
 
         inst = fromRename->insts[inst_num];
+        
+        //VUL_TRACKER
+        inst->seqNumROB = inst->seqNum;
+
         ThreadID tid = inst->threadNumber;
 
         if (!inst->isSquashed() &&
